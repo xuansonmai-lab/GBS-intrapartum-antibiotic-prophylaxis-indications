@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBS Antibiotic Prophylaxis Decision Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
+            padding: 25px 30px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        .intro-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .intro-section p {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .intro-section ul {
+            color: #495057;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .intro-section li {
+            margin-bottom: 8px;
+        }
+
+        .form-section {
+            padding: 30px;
+        }
+
+        .question-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .question-group:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .question-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .radio-option:hover {
+            background: #e3f2fd;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            color: #2196f3;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+
+        .clinical-summary {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .clinical-summary h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .clinical-summary p {
+            color: #856404;
+            line-height: 1.5;
+            font-size: 1.05em;
+        }
+
+        .recommendation {
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .recommend-yes {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .recommend-no {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .recommend-wait {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+
+        .rationale {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .rationale h4 {
+            color: #17a2b8;
+            margin-bottom: 8px;
+        }
+
+        .rationale p {
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .references-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 3px solid #dee2e6;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .references-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .reference-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .reference-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e0e0e0;
+        }
+
+        .reference-text {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+        }
+
+        .reference-text p {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .reference-text strong {
+            color: #2c3e50;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .footer .copyright {
+            font-size: 0.95em;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .radio-group {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 GBS Antibiotic Prophylaxis Decision Tool</h1>
+            <p>Clinical decision support based on evidence-based guidelines</p>
+        </div>
+
+        <div class="intro-section">
+            <h2>📖 About this Tool</h2>
+            <p>
+                This tool is designed to assist obstetricians in making accurate decisions regarding 
+                Group B Streptococcus (GBS) antibiotic prophylaxis based on current clinical criteria 
+                and evidence-based guidelines.
+            </p>
+            <p><strong>Key Features:</strong></p>
+            <ul>
+                <li>Comprehensive assessment of risk factors</li>
+                <li>Decision logic based on current practice guidelines</li>
+                <li>Automated clinical summary and clear recommendations</li>
+                <li>Scientific rationale for each decision</li>
+                <li>User-friendly interface for clinical practice</li>
+            </ul>
+        </div>
+
+        <div class="form-section">
+            <form id="gbsForm">
+                <!-- Membrane Status -->
+                <div class="question-group">
+                    <div class="question-label">Membrane Status:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="membrane_intact" name="membrane_status" value="intact">
+                            <label for="membrane_intact">Intact</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="membrane_ruptured" name="membrane_status" value="ruptured">
+                            <label for="membrane_ruptured">Ruptured</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time since membrane rupture -->
+                <div class="question-group hidden" id="rupture_time_group">
+                    <div class="question-label">Time since membrane rupture:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="rupture_lt18h" name="rupture_time" value="<18h">
+                            <label for="rupture_lt18h">< 18 hours</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="rupture_gte18h" name="rupture_time" value="≥18h">
+                            <label for="rupture_gte18h">≥ 18 hours</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Labor Status -->
+                <div class="question-group">
+                    <div class="question-label">Current Labor Status:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="no_labor" name="labor_status" value="no">
+                            <label for="no_labor">Not in labor</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="active_labor" name="labor_status" value="active">
+                            <label for="active_labor">Active labor</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestational Age -->
+                <div class="question-group">
+                    <div class="question-label">Gestational Age:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="preterm" name="gestational_age" value="<37weeks">
+                            <label for="preterm">< 37 weeks (preterm)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="term" name="gestational_age" value="≥37weeks">
+                            <label for="term">≥ 37 weeks (term)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maternal Fever -->
+                <div class="question-group">
+                    <div class="question-label">Maternal Fever (≥ 38°C/100.4°F):</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="fever_yes" name="fever" value="yes">
+                            <label for="fever_yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="fever_no" name="fever" value="no">
+                            <label for="fever_no">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Previous GBS infection -->
+                <div class="question-group">
+                    <div class="question-label">Previous pregnancy with GBS neonatal infection:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="previous_gbs_yes" name="previous_gbs_infection" value="yes">
+                            <label for="previous_gbs_yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="previous_gbs_no" name="previous_gbs_infection" value="no">
+                            <label for="previous_gbs_no">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GBS Bacteriuria -->
+                <div class="question-group">
+                    <div class="question-label">GBS bacteriuria during current pregnancy:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="bacteriuria_yes" name="gbs_bacteriuria" value="yes">
+                            <label for="bacteriuria_yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="bacteriuria_no" name="gbs_bacteriuria" value="no">
+                            <label for="bacteriuria_no">No</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="bacteriuria_unknown" name="gbs_bacteriuria" value="unknown">
+                            <label for="bacteriuria_unknown">Unknown</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GBS Test Type -->
+                <div class="question-group" id="gbs_test_group">
+                    <div class="question-label">GBS Testing Performed:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="culture_test" name="gbs_test_type" value="culture">
+                            <label for="culture_test">GBS Culture</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="pcr_test" name="gbs_test_type" value="pcr">
+                            <label for="pcr_test">GBS PCR</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="no_test" name="gbs_test_type" value="none">
+                            <label for="no_test">Not performed</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Culture Timing -->
+                <div class="question-group hidden" id="culture_timing_group">
+                    <div class="question-label">GBS culture performed within 5 weeks:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="culture_within5w" name="culture_timing" value="within5weeks">
+                            <label for="culture_within5w">Yes (< 5 weeks)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="culture_over5w" name="culture_timing" value="over5weeks">
+                            <label for="culture_over5w">No (> 5 weeks)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Result -->
+                <div class="question-group hidden" id="test_result_group">
+                    <div class="question-label">GBS Test Result:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="result_positive" name="gbs_result" value="positive">
+                            <label for="result_positive">Positive</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="result_negative" name="gbs_result" value="negative">
+                            <label for="result_negative">Negative</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PCR Timing -->
+                <div class="question-group hidden" id="pcr_timing_group">
+                    <div class="question-label">GBS PCR Timing:</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="pcr_during_labor" name="pcr_timing" value="during_labor">
+                            <label for="pcr_during_labor">During labor or membrane rupture</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="pcr_before_labor" name="pcr_timing" value="before_labor">
+                            <label for="pcr_before_labor">Before labor onset</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results and Recommendation -->
+                <div id="result" class="result-section hidden">
+                    <div class="clinical-summary">
+                        <h3>📋 Clinical Summary:</h3>
+                        <p id="clinical_summary_text"></p>
+                    </div>
+                    
+                    <div id="recommendation" class="recommendation"></div>
+                    
+                    <div class="rationale">
+                        <h4>🔍 Clinical Rationale:</h4>
+                        <p id="rationale_text"></p>
+                    </div>
+                </div>
+
+                <button type="button" class="reset-btn" onclick="resetForm()">🔄 Reset Form</button>
+            </form>
+        </div>
+
+        <!-- References Section -->
+        <div class="references-section">
+            <h3>📚 References</h3>
+            
+            <div class="reference-image">
+                <img src="https://via.placeholder.com/600x400/e3f2fd/2c3e50?text=GBS+Prevention+Algorithm" 
+                     alt="GBS Prevention Algorithm" />
+                <p style="font-style: italic; color: #666; margin-top: 10px;">
+                    Figure 1: Algorithm for GBS antibiotic prophylaxis decision-making
+                </p>
+            </div>
+
+            <div class="reference-text">
+                <p><strong>Primary References:</strong></p>
+                <p>
+                    1. American College of Obstetricians and Gynecologists. Prevention of Group B Streptococcal 
+                    Early-Onset Disease in Newborns: ACOG Committee Opinion, Number 797. Obstet Gynecol. 2020;135(2):e51-e72.
+                </p>
+                <p>
+                    2. Centers for Disease Control and Prevention. Prevention of Perinatal Group B Streptococcal Disease: 
+                    Revised Guidelines from CDC, 2010. MMWR Recomm Rep. 2010;59(RR-10):1-36.
+                </p>
+                <p>
+                    3. Verani JR, McGee L, Schrag SJ. Prevention of perinatal group B streptococcal disease--revised 
+                    guidelines from CDC, 2010. MMWR Recomm Rep. 2010;59(RR-10):1-36.
+                </p>
+                <p>
+                    <strong>Disclaimer:</strong> This tool is for educational and reference purposes only. 
+                    Final clinical decisions should always be made by the attending physician based on 
+                    individual patient assessment and clinical judgment.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>🏥 GBS Clinical Decision Support Tool</strong></p>
+            <p>Developed to enhance obstetric care quality</p>
+            <div class="copyright">
+                <p>© 2025 - Copyright belongs to [Your Name]. All rights reserved.</p>
+                <p>Email: [your.email@domain.com] | Version: 1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('gbsForm');
+        const resultDiv = document.getElementById('result');
+        
+        // Listen for form changes
+        form.addEventListener('change', function() {
+            handleFormChange();
+            evaluateCase();
+        });
+
+        function handleFormChange() {
+            const membraneStatus = document.querySelector('input[name="membrane_status"]:checked')?.value;
+            const laborStatus = document.querySelector('input[name="labor_status"]:checked')?.value;
+            const testType = document.querySelector('input[name="gbs_test_type"]:checked')?.value;
+            const pcrResult = document.querySelector('input[name="gbs_result"]:checked')?.value;
+
+            // Show/hide rupture time
+            const ruptureTimeGroup = document.getElementById('rupture_time_group');
+            if (membraneStatus === 'ruptured') {
+                ruptureTimeGroup.classList.remove('hidden');
+            } else {
+                ruptureTimeGroup.classList.add('hidden');
+            }
+
+            // Show/hide GBS test group if not in labor and membranes intact
+            const gbsTestGroup = document.getElementById('gbs_test_group');
+            if (laborStatus === 'no' && membraneStatus === 'intact') {
+                gbsTestGroup.classList.add('hidden');
+            } else {
+                gbsTestGroup.classList.remove('hidden');
+            }
+
+            // Show/hide culture timing
+            const cultureTimingGroup = document.getElementById('culture_timing_group');
+            if (testType === 'culture') {
+                cultureTimingGroup.classList.remove('hidden');
+            } else {
+                cultureTimingGroup.classList.add('hidden');
+            }
+
+            // Show/hide test result
+            const testResultGroup = document.getElementById('test_result_group');
+            if (testType === 'culture' || testType === 'pcr') {
+                testResultGroup.classList.remove('hidden');
+            } else {
+                testResultGroup.classList.add('hidden');
+            }
+
+            // Show/hide PCR timing
+            const pcrTimingGroup = document.getElementById('pcr_timing_group');
+            if (testType === 'pcr' && pcrResult === 'positive') {
+                pcrTimingGroup.classList.remove('hidden');
+            } else {
+                pcrTimingGroup.classList.add('hidden');
+            }
+        }
+
+        function evaluateCase() {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Check required input
+            if (!data.membrane_status || !data.labor_status || !data.gestational_age || 
+                !data.fever || !data.previous_gbs_infection || !data.gbs_bacteriuria) {
+                resultDiv.classList.add('hidden');
+                return;
+            }
+
+            // Generate clinical summary
+            let summary = generateClinicalSummary(data);
+            document.getElementById('clinical_summary_text').textContent = summary;
+
+            // Evaluate and provide recommendation
+            let recommendation = evaluateGBSProphylaxis(data);
+            displayRecommendation(recommendation);
+
+            resultDiv.classList.remove('hidden');
+        }
+
+        function generateClinicalSummary(data) {
+            let parts = [];
+
+            // Previous history
+            if (data.previous_gbs_infection === 'yes') {
+                parts.push('history of neonatal GBS infection');
+            } else {
+                parts.push('no history of neonatal GBS infection');
+            }
+
+            if (data.gbs_bacteriuria === 'yes') {
+                parts.push('GBS bacteriuria in current pregnancy');
+            }
+
+            // Gestational age
+            if (data.gestational_age === '<37weeks') {
+                parts.push('preterm pregnancy');
+            } else {
+                parts.push('term pregnancy');
+            }
+
+            // Membrane status
+            if (data.membrane_status === 'intact') {
+                parts.push('intact membranes');
+            } else {
+                if (data.rupture_time === '<18h') {
+                    parts.push('membrane rupture < 18 hours');
+                } else {
+                    parts.push('membrane rupture ≥ 18 hours');
+                }
+            }
+
+            // Labor status
+            if (data.labor_status === 'active') {
+                parts.push('active labor');
+            } else {
+                parts.push('not in labor');
+            }
+
+            // Fever
+            if (data.fever === 'yes') {
+                parts.push('maternal fever ≥ 38°C');
+            }
+
+            // GBS testing
+            if (data.gbs_test_type === 'culture') {
+                if (data.culture_timing === 'within5weeks') {
+                    parts.push(`GBS culture within 5 weeks: ${data.gbs_result === 'positive' ? 'positive' : 'negative'}`);
+                } else {
+                    parts.push('GBS culture > 5 weeks (not valid)');
+                }
+            } else if (data.gbs_test_type === 'pcr') {
+                if (data.gbs_result === 'positive') {
+                    parts.push(`GBS PCR ${data.pcr_timing === 'during_labor' ? 'during labor' : 'before labor'}: positive`);
+                } else {
+                    parts.push('GBS PCR negative');
+                }
+            } else {
+                parts.push('no GBS testing performed');
+            }
+
+            return parts.join(', ') + '.';
+        }
+
+        function evaluateGBSProphylaxis(data) {
+            // 1. Absolute indications
+            if (data.previous_gbs_infection === 'yes') {
+                return {
+                    decision: 'yes',
+                    rationale: 'History of neonatal GBS infection is an absolute indication for antibiotic prophylaxis.'
+                };
+            }
+
+            if (data.gbs_bacteriuria === 'yes') {
+                return {
+                    decision: 'yes',
+                    rationale: 'GBS bacteriuria during pregnancy is an absolute indication for antibiotic prophylaxis.'
+                };
+            }
+
+            // 2. Fever during labor or with ruptured membranes → Chorioamnionitis management
+            if (data.fever === 'yes' && (data.labor_status === 'active' || data.membrane_status === 'ruptured')) {
+                return {
+                    decision: 'chorioamnionitis',
+                    rationale: 'Fever during labor or with ruptured membranes suggests chorioamnionitis → Treat according to chorioamnionitis protocol (not just GBS prophylaxis).'
+                };
+            }
+
+            // 3. Not in labor and intact membranes
+            if (data.labor_status === 'no' && data.membrane_status === 'intact') {
+                return {
+                    decision: 'wait',
+                    rationale: 'No current indication for antibiotic prophylaxis. Monitor and reassess when labor begins or membranes rupture.'
+                };
+            }
+
+            // 4. Evaluation based on GBS culture
+            if (data.gbs_test_type === 'culture') {
+                if (data.culture_timing === 'within5weeks') {
+                    if (data.gbs_result === 'positive') {
+                        // Positive GBS culture within 5 weeks → Always indicated
+                        return {
+                            decision: 'yes',
+                            rationale: 'Positive GBS culture within 5 weeks → Always indicated for antibiotic prophylaxis.'
+                        };
+                    } else if (data.gbs_result === 'negative') {
+                        // Negative GBS culture within 5 weeks → No prophylaxis despite other factors
+                        return {
+                            decision: 'no',
+                            rationale: 'Negative GBS culture within 5 weeks → No antibiotic prophylaxis indicated (despite positive PCR or prolonged rupture).'
+                        };
+                    }
+                } else {
+                    // GBS culture > 5 weeks → Consider as unknown
+                    return evaluateWithoutValidGBSCulture(data);
+                }
+            } else {
+                // No GBS culture or PCR only
+                return evaluateWithoutValidGBSCulture(data);
+            }
+
+            return {
+                decision: 'no',
+                rationale: 'No indication for GBS antibiotic prophylaxis based on current criteria.'
+            };
+        }
+
+        function evaluateWithoutValidGBSCulture(data) {
+            // No valid GBS culture (not done, >5 weeks, or PCR only)
+            
+            // Preterm + ruptured membranes
+            if (data.gestational_age === '<37weeks' && data.membrane_status === 'ruptured') {
+                return {
+                    decision: 'yes',
+                    rationale: 'Preterm pregnancy + ruptured membranes without negative GBS culture → Indicated for antibiotic prophylaxis.'
+                };
+            }
+
+            // Term pregnancy
+            if (data.gestational_age === '≥37weeks') {
+                // PCR during labor
+                if (data.gbs_test_type === 'pcr' && data.pcr_timing === 'during_labor') {
+                    if (data.gbs_result === 'positive') {
+                        return {
+                            decision: 'yes',
+                            rationale: 'Term pregnancy + positive GBS PCR during labor → Indicated for antibiotic prophylaxis.'
+                        };
+                    } else if (data.gbs_result === 'negative') {
+                        return {
+                            decision: 'no',
+                            rationale: 'Negative GBS PCR during labor → No antibiotic prophylaxis indicated.'
+                        };
+                    }
+                }
+                
+                // PCR before labor has no value
+                if (data.gbs_test_type === 'pc
